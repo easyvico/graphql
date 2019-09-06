@@ -22,10 +22,20 @@ const UserType = new GraphQLObjectType({
   fields : {
       id : { type : GraphQLString },
       firstName : { type : GraphQLString },
-      age : { type : GraphQLInt }
+      age : { type : GraphQLInt },
+      company : { 
+        type : CompanyType,
+        resolve(parentValue, args) {
+          console.log(parentValue);
+          return axios.get(`http://localhost:3000/companies/${parentValue.companyId}`).then(response => {
+            return response.data;
+          })
+        }
+      }
   }
 });
 
+// fonction chargée de faire la requête vers le json server
 const RootQuery = new GraphQLObjectType({
   name : 'RootQueryType',
   fields : {
