@@ -1,6 +1,6 @@
 const graphQL = require("graphql");
 const lodash = require("lodash");
-const axios = require("axios");
+const axios = require("axios"); //permet de faire des requêtes http vers notre serveur json (ici recupérer l'url avec GET)
 
 const {
   GraphQLObjectType,
@@ -9,6 +9,7 @@ const {
   GraphQLSchema
 } = graphQL;
 
+//on déclare un type de company
 const CompanyType = new GraphQLObjectType({
   name: 'Company',
   fields : {
@@ -17,6 +18,7 @@ const CompanyType = new GraphQLObjectType({
   }
 });
 
+//on déclare un type d'utilisateur
 const UserType = new GraphQLObjectType({
   name : 'User',
   fields : {
@@ -26,7 +28,7 @@ const UserType = new GraphQLObjectType({
       company : { 
         type : CompanyType,
         resolve(parentValue, args) {
-          console.log(parentValue);
+          console.log('2- parentValue :',parentValue); //recupère les données parent user
           return axios.get(`http://localhost:3000/companies/${parentValue.companyId}`).then(response => {
             return response.data;
           })
@@ -39,15 +41,16 @@ const UserType = new GraphQLObjectType({
 const RootQuery = new GraphQLObjectType({
   name : 'RootQueryType',
   fields : {
-    user : {
-      type : UserType,
-      args : {id : { type : GraphQLString }},
-      resolve(parentValue, args){
-        return axios.get(`http://localhost:3000/users/${args.id}`).then(response => {
-          return response.data;
-        })
+      user : {
+        type : UserType,
+        args : {id : { type : GraphQLString }},
+        resolve(parentValue, args){
+          console.log('1- args :',args); //récupère l'argument (id)
+          return axios.get(`http://localhost:3000/users/${args.id}`).then(response => {
+            return response.data;
+          })
+        }
       }
-    }
   }
 })
 
